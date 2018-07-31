@@ -1,0 +1,63 @@
+#Name of C compiler
+CCMPL = gcc
+#Name of Fortran compiler
+FPATH = 
+F77 = $(FPATH)ifort
+F90 = $(FPATH)ifort
+#F77 = gfortran
+#compiling object file flags
+OPT1 = -O3 -mkl -parallel
+OPT2 = 
+#OPT1 = -O0 -g -CB -warn 
+#OPT2 = 
+FFLAGS = -c $(OPT1) $(OPT2)
+#FFLAGS = -c -O0 -g -CB -warn $(OPT2)
+#linking flags
+LFLAGS = $(OPT1) $(OPT2) 
+#LFLAGS = -O0 -g -CB -warn $(OPT2)
+#testing flags
+#LFLAGS = -O0 -g -CB
+#Compiler flag for MPI
+LMP = -qopenmp 
+#fitsio libraries
+FITSIODIR = /usr/local/lib
+#Pgplot plot libraries
+PGPLOTDIR = /usr/local/lib
+#X11 libraries
+X11DIR = /usr/X11/lib
+# libraries for linking PGPLOT
+LIBS = -L$(PGPLOTDIR) -L$(X11DIR) -lX11 -lpgplot -lpng
+#LIBS = -L$(PGPLOTDIR) -L$(X11DIR) -lX11 -lpgplot -lpng 
+# libraries for linking CFITSIO
+LIBS2 = -L$(PGPLOTDIR) -L$(X11DIR) -L$(FITSIODIR) -lX11 -lpgplot -lcfitsio -lpng
+#Directory where executable are placed
+BIN = /Users/rowe/Documents/SMS_POEP/bin/
+#utils source directory
+UTILS = utils/
+
+#Listing of programs to create.
+
+all: scenesim
+
+scenesimincl = precision.o 
+scenesim: scenesim.f90 $(scenesimincl)
+	$(F90) $(LFLAGS) -o $(BIN)$@ scenesim.f90 $(scenesimincl)
+
+#building object libraries
+%_mp.o : $(UTILS)%.f90
+	$(F90) $(FFLAGS) $(LMP) -o $@ $(UTILS)$*.f90
+
+%_mp.o : $(UTILS)%.f
+	$(F77) $(FFLAGS) $(LMP) -o $@ $(UTILS)$*.f
+
+%.o : $(UTILS)%.f90
+	$(F90) $(FFLAGS) -o $@ $<
+
+%.o : $(UTILS)%.f
+	$(F77) $(FFLAGS) -o $@ $<
+
+# Removing object files
+.PHONY : clean
+clean :
+	rm *.o
+	rm *.mod
