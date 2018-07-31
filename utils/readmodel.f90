@@ -1,8 +1,8 @@
-subroutine readmodel(filename)
+subroutine readmodel(nunit,filestatus)
 use precision
 implicit none
 !input vars
-character(80) :: filename
+integer :: nunit,filestatus
 !local vars
 
 
