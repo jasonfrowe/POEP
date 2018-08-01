@@ -6,5 +6,6 @@ integer :: nunit,filestatus
 !local vars
 
 
+
 return
 end subroutine readmodel
