@@ -20,6 +20,12 @@ interface
 		real(double), dimension(:,:) :: data
 		type(starpos), dimension(:,:) :: stars,stars2
 	end subroutine genstarpos
+	subroutine genstarflux(npt,nstars,stars,stars2)
+		use precision
+		use startype
+		integer :: npt,nstars
+		type(starpos), dimension(:,:) :: stars,stars2
+	end subroutine genstarflux
     subroutine displayfits(nxmax,nymax,parray,bpix,tavg,sigscale)
      	use precision
         implicit none

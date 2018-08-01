@@ -37,9 +37,14 @@ UTILS = utils/
 
 #Listing of programs to create.
 
-all: scenesim
+all: scenesim scenedatagen
 
-scenesimincl = precision.o 
+scenedatagenincl = precision.o startype.o median.o rqsort.o genstarpos.o \
+ displayfits.o heatlut.o stdev.o ran2.o
+scenedatagen: scenedatagen.f90 $(scenedatagenincl)
+	$(F90) $(LFLAGS) -o $(BIN)$@ scenedatagen.f90 $(scenedatagenincl) $(LIBS)
+
+scenesimincl = precision.o readmodel.o
 scenesim: scenesim.f90 $(scenesimincl)
 	$(F90) $(LFLAGS) -o $(BIN)$@ scenesim.f90 $(scenesimincl)
 
