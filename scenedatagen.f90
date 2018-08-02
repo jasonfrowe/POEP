@@ -118,8 +118,7 @@ mindate=minval(data(1,1:npt))
 !write(6,*) "Date xsig  xsig  xysig"
 do i=1,npt
 	write(6,500) data(1,i)-mindate,data(7,i),data(8,i),data(9,i),&
-	  (stars(j,i)%xcoo,stars(j,i)%ycoo,stars(j,i)%flux, &
-	  stars2(j,i)%xcoo,stars2(j,i)%ycoo,stars2(j,i)%flux,j=2,nstars)
+	  (stars(j,i)%xcoo,stars(j,i)%ycoo,stars(j,i)%flux,j=1,nstars)
 enddo
 500 format(F13.8,1X,2(F5.3,1X),F6.3, &
 	  512(1X,F7.2,1X,F7.2,1X,F13.11,1X,F7.2,1X,F7.2,1X,F13.11))
