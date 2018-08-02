@@ -101,6 +101,20 @@ allocate(per(np))
 per(1)=3.0
 per(2)=6.0
 per(3)=9.0
+nsep=3
+allocate(sep(nsep)) !separation in pixels 
+sep(1)=0.5
+sep(2)=2.0
+sep(3)=5.0
+ndmag=4
+allocate(dmag(ndmag))
+dmag(1)=0.0
+dmag(2)=3.0
+dmag(3)=9.0
+dmag(4)=13.0
+
+goto 10
+
 do i=1,nst !loop over stellar types
 	sol(1)=rhostar(i) !set mean stellar density
 	sol(2)=ld1(i)
@@ -144,17 +158,6 @@ enddo
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !generate foreground blends (bright star has signal)!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-nsep=3
-allocate(sep(nsep)) !separation in pixels 
-sep(1)=0.5
-sep(2)=2.0
-sep(3)=5.0
-ndmag=4
-allocate(dmag(ndmag))
-dmag(1)=0.0
-dmag(2)=3.0
-dmag(3)=9.0
-dmag(4)=13.0
 !Transit model parameters - using Sun as FG star
 sol(1)=rhostar(1) !set mean stellar density
 sol(2)=ld1(1)
@@ -184,9 +187,9 @@ do i=1,nsep !loop over separations
 				sol(9)=sol(10)*ran2(seed) !set T0 as random phase from 0 to 1
 				sol(11)=0.8*ran2(seed) !set impact parameter [0-0.8]
 				sol(15)=radialvel(mstar(1),mpl(k),sol(10),sol(11),sol(1))
-				sol(18)=albedo(Ag,Rpl(i),sol(10),sol(1),rstar(i))
+				sol(18)=albedo(Ag,Rpl(i),sol(10),sol(1),rstar(1))
 				sol(16)=sol(18) !secondary is equal to phase curve (no thermal)
-				sol(17)=tides(mstar(i),rstar(i),mpl(k),sol(1),sol(10),sol(11))
+				sol(17)=tides(mstar(1),rstar(1),mpl(k),sol(1),sol(10),sol(11))
 				call transitmodel(nfit,nplanet,nplanetmax,sol,nmax,npt,time,itime, &
  				  ntt,tobs,omc,tmodel,dtype)
 
@@ -232,28 +235,57 @@ enddo
 !Generate Background Blends!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+10 continue
+!Transit model parameters - using Sun as FG star
+sol(1)=rhostar(1) !set mean stellar density
+sol(2)=ld1(1)
+sol(3)=ld2(1)
+sol(4)=0.0d0 !using quad limb-darkening, so these are set to zero.
+sol(5)=0.0d0 
+sol(6)=0.0d0 !no dilution needed
+sol(7)=0.0d0 !no RVs
+sol(8)=0.0d0 !set photometric zero point to zero
+sol(13)=0.0d0 !eccentricity
+sol(14)=0.0d0
+sol(15)=0.0d0 !RV amplitude (not needed)
+sol(16)=0.0d0 !secondary eclipse, default is zero. 
+sol(17)=0.0d0
+sol(18)=0.0d0 !albedo amp
 ntdur=2
 allocate(tdur(ntdur))
-tdur(1)=1.0 !transit-duration in hours
-tdur(2)=3.0 !transit-duration in hours
+tdur(1)=1.40 !use Sun for long transit dur
+tdur(2)=10.0 !use a RD for short transit dur 
 !generate false positives
 do i=1,nsep !loop over separations
 	do j=1,ntd !loop over transit depths
 		sol(12)=(0.5+ran2(seed))*RedRs/rstar(3)  !1 to 1.5 Rearth around a BD
-		fratio=(rpl(1)*RedRs/rstar(1))**2.0d0 / (sol(12))**2.0d0
-		write(0,*) "fratio: ",fratio
-		read(5,*)
+		fratio=(sol(12))**2.0d0 / (2.0*rpl(1)*RedRs/rstar(1))**2.0d0
+		if((fratio.ge.1.0d0).or.(fratio.le.0.0d0)) &
+		  write(0,*) "Warning.. fratio out of bounds: ",fratio
 		do k=1,ntdur !loop over transit durations
+			sol(1)=tdur(k)
 			do l=1,np !loop over periods
 				nrast=nrast+1
 				ix=(nrast-1)/nsub+1
 				iy=nrast-nsub*(ix-1)
+
+				sol(10)=per(l)+1.5d0*ran2(seed) !set orbital period, with extra jitter
+				sol(9)=sol(10)*ran2(seed) !set T0 as random phase from 0 to 1
+				sol(11)=ran2(seed) !set impact parameter [0-1.0]
+				sol(15)=radialvel(mstar(1),1.5*mpl(1),sol(10),sol(11),sol(1))
+				sol(18)=albedo(0,5,2.0*Rpl(1),sol(10),sol(1),rstar(1))
+				sol(17)=tides(mstar(1),rstar(1),1.5*mpl(1),sol(1),sol(10),sol(11))
+				sol(16)=2.2d-3+sol(18)!add in a 0.22% secondary eclipse 
+				call transitmodel(nfit,nplanet,nplanetmax,sol,nmax,npt,time,itime, &
+ 				  ntt,tobs,omc,tmodel,dtype)
 				
 				nstars=nstars+1
 				if(nstars.le.nstarmax)then
 					xcoo(nstars)=dx*(ix-1)+dx/2.0d0+ran2(seed) !jitter to move off center
 					ycoo(nstars)=dy*(iy-1)+dy/2.0d0+ran2(seed)
-					fluxes(nstars)=1.0d0
+					do ii=1,npt
+						stars(nstars,ii)%flux=1.0d0
+					enddo
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -264,7 +296,9 @@ do i=1,nsep !loop over separations
 					th=tPi*ran2(seed)
 					xcoo(nstars)=xcoo(nstars-1)+sep(i)*cos(th)
 					ycoo(nstars)=ycoo(nstars-1)+sep(i)*sin(th)
-					fluxes(nstars)=1.0d0*fratio
+					do ii=1,npt
+						stars(nstars,ii)%flux=tmodel(ii)*fratio !diluted background
+					enddo
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
