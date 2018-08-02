@@ -86,37 +86,37 @@ call genstars(npt,nf,nstars,data,stars,xout,yout,nsub,seed)
 
 !place stars on pixel map
 
-allocate(pixels(xout,yout))
-!display fits file
-call pgopen('?')
-!call pgopen('/xserve')
-call PGPAP (8.0 ,1.0) !use a square 8" across
-call pgask(.false.)
-do kk=1,npt
-	pixels=0.0
-	do i=1,nstars
-		do j=-2,2
-			do k=-2,2
-				ii=int(stars(i,kk)%xcoo)+j
-				jj=int(stars(i,kk)%ycoo)+k
-				pixels(ii,jj)=pixels(ii,jj)+stars(i,kk)%flux
-			enddo
-		enddo
-	enddo
-
-	bpix=99.9e30
-	tavg=0.0d0
-	sigscale=3.0
-	call displayfits(xout,yout,pixels,bpix,tavg,sigscale)
-enddo
-call pgclos()
+!allocate(pixels(xout,yout))
+!!display fits file
+!call pgopen('?')
+!!call pgopen('/xserve')
+!call PGPAP (8.0 ,1.0) !use a square 8" across
+!call pgask(.false.)
+!do kk=1,npt
+!	pixels=0.0
+!	do i=1,nstars
+!		do j=-2,2
+!			do k=-2,2
+!				ii=int(stars(i,kk)%xcoo)+j
+!				jj=int(stars(i,kk)%ycoo)+k
+!				pixels(ii,jj)=pixels(ii,jj)+stars(i,kk)%flux
+!			enddo
+!		enddo
+!	enddo
+!
+!	bpix=99.9e30
+!	tavg=0.0d0
+!	sigscale=3.0
+!	call displayfits(xout,yout,pixels,bpix,tavg,sigscale)
+!enddo
+!call pgclos()
 
 !calculate min date so that the time-series starts at zero.
 mindate=minval(data(1,1:npt))
 
 !writing out datafile
 !write(6,*) "Date xsig  xsig  xysig"
-do i=1,1
+do i=1,npt
 	write(6,500) data(1,i)-mindate,data(7,i),data(8,i),data(9,i),&
 	  (stars(j,i)%xcoo,stars(j,i)%ycoo,stars(j,i)%flux, &
 	  stars2(j,i)%xcoo,stars2(j,i)%ycoo,stars2(j,i)%flux,j=2,nstars)
