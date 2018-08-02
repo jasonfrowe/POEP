@@ -26,7 +26,7 @@ dx=dble(xout)/dble(nsub)
 dy=dble(yout)/dble(nsub)
 
 !positional info for secondary
-r=min(dx,dy)/2.0*0.96
+r=min(dx,dy)/2.0*0.3
 
 !pre-calculate doubles
 dnsub=dble(nsub)

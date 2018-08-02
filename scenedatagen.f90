@@ -4,7 +4,7 @@ use precision
 use startype
 implicit none
 integer :: nunit,filestatus,npt,i,j,k,nmax,nf,xout,yout,nsub,nstars,seed, &
- ii,jj,kk
+ ii,jj,kk,nstarmax
 integer, dimension(3) :: now
 real(double) :: mindate,bpix,tavg,sigscale,ran2,dumr
 real(double), allocatable, dimension(:,:) :: data,pixels
@@ -12,20 +12,14 @@ character(80) :: modelfile,cline
 type(starpos), allocatable, dimension(:,:) :: stars,stars2
 
 interface
-	subroutine genstarpos(npt,nf,nstars,data,stars,stars2,xout,yout,nsub,seed)
+	subroutine genstars(npt,nf,nstars,data,stars,xout,yout,nsub,seed)
 		use precision
 		use startype
 		implicit none
-		integer :: npt,nf,xout,yout,nsub,nstars,seed
+		integer :: npt,nf,nstars,xout,yout,nsub,seed
 		real(double), dimension(:,:) :: data
-		type(starpos), dimension(:,:) :: stars,stars2
-	end subroutine genstarpos
-	subroutine genstarflux(npt,nstars,stars,stars2)
-		use precision
-		use startype
-		integer :: npt,nstars
-		type(starpos), dimension(:,:) :: stars,stars2
-	end subroutine genstarflux
+		type(starpos), dimension(:,:) :: stars
+	end subroutine genstars
     subroutine displayfits(nxmax,nymax,parray,bpix,tavg,sigscale)
      	use precision
         implicit none
@@ -44,7 +38,7 @@ nf=16 !number of fields in MOST data
 xout=1024  !dimensions for output image.
 yout=1024
 nsub=16 !number of subrasters for star sims
-nstars=nsub*nsub !number of stars to generate.
+nstarmax=472 !maximum number of stars we will generate.
 
 !Initialization of random number
 call itime(now)
@@ -87,15 +81,8 @@ write(0,*) "Number of model points: ",npt  !report number of data points read.
 !allocate space to contain properties of simulated stars
 !stars - primary target
 !stars2 - secondary target
-allocate(stars(nstars,npt),stars2(nstars,npt))
-
-!generate positions 
-call genstarpos(npt,nf,nstars,data,stars,stars2,xout,yout,nsub,seed)
-
-!generate fluxes
-call genstarflux(npt,nstars,stars,stars2)
-!stars(:,:)%flux=1.0d0 !give a constant for the moment.  
-!stars2(:,:)%flux=0.2d0
+allocate(stars(nstarmax,npt))
+call genstars(npt,nf,nstars,data,stars,xout,yout,nsub,seed)
 
 !place stars on pixel map
 
@@ -113,9 +100,6 @@ do kk=1,npt
 				ii=int(stars(i,kk)%xcoo)+j
 				jj=int(stars(i,kk)%ycoo)+k
 				pixels(ii,jj)=pixels(ii,jj)+stars(i,kk)%flux
-				ii=int(stars2(i,kk)%xcoo)+j
-				jj=int(stars2(i,kk)%ycoo)+k
-				pixels(ii,jj)=pixels(ii,jj)+stars2(i,kk)%flux
 			enddo
 		enddo
 	enddo
@@ -131,10 +115,13 @@ call pgclos()
 mindate=minval(data(1,1:npt))
 
 !writing out datafile
-write(6,*) "Date xsig  xsig  xysig"
-do i=1,10
-	write(6,500) data(1,i)-mindate,data(7,i),data(8,i),data(9,i)
+!write(6,*) "Date xsig  xsig  xysig"
+do i=1,1
+	write(6,500) data(1,i)-mindate,data(7,i),data(8,i),data(9,i),&
+	  (stars(j,i)%xcoo,stars(j,i)%ycoo,stars(j,i)%flux, &
+	  stars2(j,i)%xcoo,stars2(j,i)%ycoo,stars2(j,i)%flux,j=2,nstars)
 enddo
-500 format(F13.8,1X,2(F5.3,1X),F6.3,1X)
+500 format(F13.8,1X,2(F5.3,1X),F6.3, &
+	  512(1X,F7.2,1X,F7.2,1X,F13.11,1X,F7.2,1X,F7.2,1X,F13.11))
 
 end program scenedatagenerator
