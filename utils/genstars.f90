@@ -113,8 +113,6 @@ dmag(2)=3.0
 dmag(3)=9.0
 dmag(4)=13.0
 
-goto 10
-
 do i=1,nst !loop over stellar types
 	sol(1)=rhostar(i) !set mean stellar density
 	sol(2)=ld1(i)
@@ -235,7 +233,6 @@ enddo
 !Generate Background Blends!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-10 continue
 !Transit model parameters - using Sun as FG star
 sol(1)=rhostar(1) !set mean stellar density
 sol(2)=ld1(1)
@@ -298,6 +295,8 @@ do i=1,nsep !loop over separations
 					ycoo(nstars)=ycoo(nstars-1)+sep(i)*sin(th)
 					do ii=1,npt
 						stars(nstars,ii)%flux=tmodel(ii)*fratio !diluted background
+						!write(0,*) tmodel(ii),fratio
+						!read(5,*)
 					enddo
 				else
 					write(0,*) "Error, nstars > nstarmax"
