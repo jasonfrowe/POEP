@@ -3,7 +3,7 @@ use precision
 use startype
 implicit none
 !import vars
-integer :: npt,nf,nstars,xout,yout,nsub,seed
+integer :: npt,nf,nstars,xout,yout,nsub,seed,nunit
 real(double), dimension(:,:) :: data
 type(starpos), dimension(:,:) :: stars
 !local vars
@@ -17,6 +17,7 @@ integer :: nplanet,nfit,nplanetmax,nmax
 integer, allocatable, dimension(:) :: dtype,ntt
 real(double), allocatable, dimension(:) :: sol,time,itime,tmodel
 real(double), allocatable, dimension(:,:) :: tobs,omc
+character(80) :: file
 
 !Constants
 Pi=acos(-1.d0)!define Pi and 2*Pi
