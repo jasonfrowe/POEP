@@ -9,7 +9,7 @@ integer, dimension(3) :: now
 real(double) :: mindate,bpix,tavg,sigscale,ran2,dumr
 real(double), allocatable, dimension(:,:) :: data,pixels
 character(80) :: modelfile,cline
-type(starpos), allocatable, dimension(:,:) :: stars,stars2
+type(starpos), allocatable, dimension(:,:) :: stars
 
 interface
 	subroutine genstars(npt,nf,nstars,data,stars,xout,yout,nsub,seed)

@@ -55,6 +55,7 @@ allocate(fluxes(nstarmax),xcoo(nstarmax),ycoo(nstarmax))
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !generate single stars with transits!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+write(0,*) "Generating single stars with transits"
 nst=3
 allocate(rhostar(nst),Ag(nst),rstar(nst),mstar(nst),ld1(nst),ld2(nst))
 rhostar(1)=1.4
@@ -156,6 +157,7 @@ enddo
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !generate foreground blends (bright star has signal)!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+write(0,*) "Generating foreground blends"
 !Transit model parameters - using Sun as FG star
 sol(1)=rhostar(1) !set mean stellar density
 sol(2)=ld1(1)
@@ -232,7 +234,7 @@ enddo
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !Generate Background Blends!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+write(0,*) "Generating Background Blends"
 !Transit model parameters - using Sun as FG star
 sol(1)=rhostar(1) !set mean stellar density
 sol(2)=ld1(1)
@@ -320,7 +322,9 @@ do i=j,nsub*nsub
 	if(nstars.le.nstarmax)then
 		xcoo(nstars)=dx*(ix-1)+dx/2.0d0+ran2(seed) !jitter to move off center
 		ycoo(nstars)=dy*(iy-1)+dy/2.0d0+ran2(seed)
-		fluxes(nstars)=1.0d0
+		do ii=1,npt
+			stars(nstars,ii)%flux=1.0d0
+		enddo
 	else
 		write(0,*) "Error, nstars > nstarmax"
 		stop
