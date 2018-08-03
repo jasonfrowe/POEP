@@ -230,8 +230,7 @@ do i=1,nsep !loop over separations
 						!write(0,*) tmodel(ii)
 						!read(5,*)
 					enddo
-					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),&
-					  sol(3),sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
+					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,(0.0d0,ii=1,11)
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -298,8 +297,7 @@ do i=1,nsep !loop over separations
 					do ii=1,npt
 						stars(nstars,ii)%flux=1.0d0
 					enddo
-					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),&
-					  sol(3),sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
+					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),0.0d0,(0.0d0,ii=1,11)
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -344,6 +342,8 @@ do i=j,nsub*nsub
 		do ii=1,npt
 			stars(nstars,ii)%flux=1.0d0
 		enddo
+		fratio=1.0
+		write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,(0.0d0,ii=1,11)
 	else
 		write(0,*) "Error, nstars > nstarmax"
 		stop
