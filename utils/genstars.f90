@@ -114,6 +114,11 @@ dmag(2)=3.0
 dmag(3)=9.0
 dmag(4)=13.0
 
+nunit=10
+file="SimTable.txt"
+open(unit=nunit,file="SimTable.txt")
+500 format(I6,2(1X,F8.3),12(1X,1PE17.10))
+
 do i=1,nst !loop over stellar types
 	sol(1)=rhostar(i) !set mean stellar density
 	sol(2)=ld1(i)
@@ -145,6 +150,9 @@ do i=1,nst !loop over stellar types
 				xcoo(nstars)=dx*(ix-1)+dx/2.0d0+ran2(seed) !jitter to move off center
 				ycoo(nstars)=dy*(iy-1)+dy/2.0d0+ran2(seed)
 				!write(0,*) nstars,xcoo(nstars),ycoo(nstars)
+				fratio=1.0d0
+				write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),sol(3),&
+				  sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
 			else 
 				write(0,*) "Error, nstars > nstarmax"
 				stop
@@ -202,6 +210,8 @@ do i=1,nsep !loop over separations
 						!write(0,*) tmodel(ii)
 						!read(5,*)
 					enddo
+					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),&
+					  sol(3),sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -219,6 +229,8 @@ do i=1,nsep !loop over separations
 						!write(0,*) tmodel(ii)
 						!read(5,*)
 					enddo
+					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),&
+					  sol(3),sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -285,6 +297,8 @@ do i=1,nsep !loop over separations
 					do ii=1,npt
 						stars(nstars,ii)%flux=1.0d0
 					enddo
+					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),&
+					  sol(3),sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -300,6 +314,8 @@ do i=1,nsep !loop over separations
 						!write(0,*) tmodel(ii),fratio
 						!read(5,*)
 					enddo
+					write(nunit,500) nstars,xcoo(nstars),ycoo(nstars),fratio,sol(1),sol(2),&
+					  sol(3),sol(9),sol(10),sol(11),sol(12),sol(15),sol(16),sol(17),sol(18)
 				else
 					write(0,*) "Error, nstars > nstarmax"
 					stop
@@ -308,6 +324,8 @@ do i=1,nsep !loop over separations
 		enddo
 	enddo
 enddo
+
+close(nunit)
 
 
 !add in contant stars

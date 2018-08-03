@@ -1,15 +1,15 @@
-subroutine displayfits(nxmax,nymax,parray,bpix,tavg,sigscale)
+subroutine displayfits(nxmax,nymax,parray,bpix,tavg,sigscale,seed)
 !Jason Rowe 2015 - jasonfrowe@gmail.com
 use precision
 implicit none
-integer :: nxmax,nymax,npt,i,j,ncol,dumi,ndiff,k,nreplace
+integer :: nxmax,nymax,npt,i,j,ncol,dumi,ndiff,k,ix,iy,seed
 integer, dimension(4) :: nr
 integer, allocatable, dimension(:) :: p
 integer, allocatable, dimension(:,:) :: ia
 real :: r,g,b,dumr,x2,y2,xr
 real, dimension(4) :: rj
 real(double) :: bpix,maxp,minp,z1,z2,med,std,stdev2,tavg,lmin,lmax, &
-   ratio,lmed,lstd,minlp,replacethres,sigscale
+   ratio,lmed,lstd,minlp,sigscale,ran2
 real(double), dimension(:,:) :: parray
 real(double), allocatable, dimension(:) :: a
 real(double), allocatable, dimension(:,:) :: lparray
@@ -50,18 +50,30 @@ rj=real(nr)
 !write(0,*) "hello",nr
 
 allocate(a(npt),p(npt))
+
+!k=0
+!do i=nr(1),nr(2),5
+!   do j=nr(3),nr(4),5
+!      if(parray(i,j).lt.bpix)then
+!         k=k+1
+!         a(k)=parray(i,j)
+!!         write(0,*) k,a(k)
+!         if(k.ge.1000) goto 10
+!      endif
+!   enddo
+!enddo
+!10 continue
+
 k=0
-do i=nr(1),nr(2),5
-   do j=nr(3),nr(4),5
-      if((parray(i,j).lt.bpix).and.(abs(parray(i,j)).lt.50.0))then
-         k=k+1
-         a(k)=parray(i,j)
-!         write(0,*) k,a(k)
-         if(k.ge.1000) goto 10
-      endif
-   enddo
+do i=1,1000
+   ix=(nr(2)-nr(1))*ran2(seed)+nr(1)
+   iy=(nr(4)-nr(3))*ran2(seed)+nr(3)
+   if(parray(ix,iy).lt.bpix)then
+      k=k+1
+      a(k)=parray(ix,iy)
+   endif
 enddo
-10 continue
+
 !write(0,*) "K:",k
 if(k.ge.3)then
    call rqsort(k,a,p)
@@ -73,9 +85,6 @@ else
 endif
 deallocate(a,p)
 !write(0,*) "Med,std: ",med,std
-
-replacethres=-10.0
-nreplace=0
 
 allocate(ia(nxmax,nymax))
 
@@ -141,14 +150,14 @@ call pgvport(0.0,1.00,0.0,1.0)
 call pgwindow(0.0,1.0,0.0,1.0)
 !call PGRECT (0.0, 1.0, 0.0, 1.0)
 
-call pgvport(0.10,0.95,0.15,0.95) !make room around the edges for labels
+call pgvport(0.20,0.95,0.15,0.95) !make room around the edges for labels
 call pgsci(1)
 call pgwindow(rj(1),rj(2),rj(3),rj(4)) !plot scale
 call pgbox("BCNTS1",0.0,0,"BCNTS1",0.0,0)
 !call pglabel("X (pixels)","Y (pixels)","")
 call pgptxt((rj(1)+rj(2))/2.0,rj(3)-0.16*(rj(4)-rj(3)),0.0,0.5,         &
    "X (pixels)")
-call pgptxt(rj(1)-0.06*(rj(2)-rj(1)),(rj(4)+rj(3))/2,90.0,0.5,          &
+call pgptxt(rj(1)-0.14*(rj(2)-rj(1)),(rj(4)+rj(3))/2,90.0,0.5,          &
    "Y (pixels)")
 call pgsci(1)
 
@@ -218,15 +227,6 @@ call pgsci(1)
 
 deallocate(ia,lparray)
 
-!update refarray
-
-!do i=nr(1),nr(2)
-!   do j=nr(3),nr(4)
-!      if(parray(i,j).gt.replacethres)then
-!         refarray(i,j)=parray(i,j)
-!      endif
-!   enddo
-!enddo
 
 
 !write(11,501) tavg,minp,maxp,med,std,z1,z2

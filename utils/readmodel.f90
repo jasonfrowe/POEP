@@ -15,6 +15,8 @@ npt=1   !initalize counter for number of data points
 do !we do a loop.  If there are memory errors, we can get more this way
 	read(nunit,*,iostat=filestatus) (data(i,npt),i=1,4),(stars(i,npt)%xcoo,stars(i,npt)%ycoo,& 
 	  stars(i,npt)%flux,i=1,nstarmax)
+	!write(0,*) stars(1,npt)%xcoo,stars(1,npt)%ycoo,stars(1,npt)%flux
+	!read(5,*)
 	if(filestatus == 0) then
 		npt=npt+1
 	elseif(filestatus == -1) then
