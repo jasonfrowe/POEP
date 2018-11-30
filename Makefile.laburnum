@@ -39,14 +39,17 @@ UTILS = utils/
 
 all: scenesim scenedatagen
 
-scenedatagenincl = precision.o startype.o median.o rqsort.o genstarpos.o \
- displayfits.o heatlut.o stdev.o ran2.o
+scenedatagenincl = precision_mp.o startype_mp.o median_mp.o rqsort_mp.o displayfits_mp.o \
+ heatlut_mp.o stdev_mp.o ran2_mp.o genstars_mp.o transitmodel_mp.o keplerian_mp.o ttcor_mp.o \
+ mandelagol_mp.o occultquad_mp.o radialvel_mp.o albedo_mp.o tides_mp.o
 scenedatagen: scenedatagen.f90 $(scenedatagenincl)
-	$(F90) $(LFLAGS) -o $(BIN)$@ scenedatagen.f90 $(scenedatagenincl) $(LIBS)
+	$(F90) $(LFLAGS) -qopenmp -o $(BIN)$@ scenedatagen.f90 $(scenedatagenincl) $(LIBS)
 
-scenesimincl = precision.o readmodel.o
+scenesimincl = precision_mp.o startype_mp.o readmodel_mp.o addflux2pix_mp.o displayfits_mp.o \
+ heatlut_mp.o rqsort_mp.o stdev_mp.o genKernel_mp.o convolveft_mp.o ran2_mp.o writefits_mp.o \
+ deletefile_mp.o
 scenesim: scenesim.f90 $(scenesimincl)
-	$(F90) $(LFLAGS) -o $(BIN)$@ scenesim.f90 $(scenesimincl)
+	$(F90) $(LFLAGS) -qopenmp -o $(BIN)$@ scenesim.f90 $(scenesimincl) $(LIBS2)
 
 #building object libraries
 %_mp.o : $(UTILS)%.f90

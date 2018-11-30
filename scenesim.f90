@@ -102,7 +102,7 @@ allocate(Kernel(nKs,nKs))
 bpix=99.9e30 !pixel with values above bpix are considered bad
 sigscale=10.0 !clipping for display purposes, sig=0 displays full scale.
 call pgopen('?')
-call PGPAP (16.0 ,1.0) !use a square 8" across
+call PGPAP (8.0 ,1.0) !use a square 8" across
 call pgask(.false.)
 do i=1,npt  !time-series
 	pixels=0.0d0

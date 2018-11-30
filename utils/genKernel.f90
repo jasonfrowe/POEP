@@ -19,9 +19,9 @@ do i=1,nKs
 		dj=dble(j)
 		yd=(dj-yc)/noversample
 		expt1=-((xd/sx)**2.0)
-        expt2=-((yd/sy)**2.0)
-        expt3=2.0*sxy*(xd*yd)/(sx*sy)
-        Kernel(i,j)=exp(expt1+expt2+expt3)
+		expt2=-((yd/sy)**2.0)
+		expt3=2.0*sxy*(xd*yd)/(sx*sy)
+		Kernel(i,j)=exp(expt1+expt2+expt3)
         !write(0,*) i,j,Kernel(i,j)
 	enddo
 	!read(5,*)
