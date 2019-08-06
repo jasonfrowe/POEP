@@ -62,7 +62,7 @@ nstarmax=472 !maximum number of stars
 nmax=100000  !maximum number of data points in time-series 
 
 !Name for output
-prefix="sgen"
+prefix="FITS/sgen"
 
 !Initialization of random number
 call itime(now)
